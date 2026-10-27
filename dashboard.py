@@ -1,22 +1,33 @@
+
+from pathlib import Path
 import pandas as pd
-import plotly.express as px
 import streamlit as st
 
-st.set_page_config(page_title="Vomerão", layout="wide", page_icon="👟")
-
-
 @st.cache_data
-def carregar_dados(caminho_arquivo):
+def carregar_dados(caminho_arquivo=None):
+    # Localiza a pasta onde está este script
+    pasta_script = Path(__file__).resolve().parent
+
+    # Usa o caminho informado ou procura a planilha na pasta do script
+    if caminho_arquivo is None:
+        caminho_arquivo = pasta_script / "Tabela 1.1.2.xls"
+
     # Carrega todas as abas do Excel
     xls = pd.ExcelFile(caminho_arquivo)
 
-    # Filtra apenas as abas de anos (ignorando as abas de Coeficiente de Variação - CV)
-    abas_anos = [sheet for sheet in xls.sheet_names if "(CV)" not in sheet]
+    # Filtra apenas as abas de anos
+    abas_anos = [
+        sheet for sheet in xls.sheet_names
+        if "(CV)" not in sheet
+    ]
 
     dados_totais = []
 
     for ano in abas_anos:
         df_raw = pd.read_excel(xls, sheet_name=ano)
+
+        # Continue aqui com o restante do seu processamento
+
 
         # Localizar onde começam os dados de localização (Brasil, Regiões, UFs)
         start_idx = df_raw[df_raw.iloc[:, 0] == "Brasil"].index[0]
